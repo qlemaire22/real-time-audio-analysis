@@ -1,0 +1,29 @@
+<h4>Home</h4>
+<br>
+<p>
+  Click on start recording to start the real-time analysis of the audio.
+</p>
+<br>
+<div class="container">
+  <div class="row">
+    <div class="col-sm">
+      <button type="button" id="start" (click)="startRecording()" class="btn btn-primary float-right">Start recording</button>
+    </div>
+    <div class="col-sm">
+      <button type="button" id="stop" (click)="stopRecording()" class="btn btn-primary">Stop recording</button>
+    </div>
+    <div class="col-sm">
+      <button type="button" id="play" (click)="playRecordedAudio()" class="btn btn-primary float-left">Play recording</button>
+    </div>
+  </div>
+</div>
+<br>
+<br>
+<p class="text-center">
+  <b>
+    Output
+  </b>
+</p>
+<div class="jumbotron" innerHTML="{{result}}">
+
+</div>

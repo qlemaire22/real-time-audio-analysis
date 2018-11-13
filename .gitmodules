@@ -1,0 +1,3 @@
+[submodule "speech-music-detection"]
+	path = speech-music-detection
+	url = https://github.com/qlemaire22/speech-music-detection

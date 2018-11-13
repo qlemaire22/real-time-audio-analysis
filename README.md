@@ -1,27 +1,43 @@
-# RealTimeAudioAnalysis
+# Real-time Audio Analysis
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 7.0.4.
+## Description
 
-## Development server
+This project is made to analyze in real time the audio recorded from the microphone with a neural network for the speech and music detection task. It can be used for many other tasks by changing the network and the post-processing.
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+The network is built with [this project](https://github.com/qlemaire22/speech-music-detection) and the project is used as a sub-module for the pre-processing of the audio.
 
-## Code scaffolding
+The application is built with `Angular`, `Electron` and `Bootstrap`. The backend is coded in Python with `Flask`.
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+The audio is recorded with `MediaRecorder` and then sent as a `base64` data to the Python backend that build the `.webm` and then process the audio.
 
-## Build
+The data is transferred to the backend with a POST request.
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
+## Requirements
 
-## Running unit tests
+- `SoX` (http://sox.sourceforge.net) is used for the resampling of the audio.
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+- `avconv` (https://libav.org/avconv.html) is used for the conversion from `.webm` to `.wav`.
 
-## Running end-to-end tests
+- All the requirements of the submodule  https://github.com/qlemaire22/speech-music-detection
 
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
+## Installation
 
-## Further help
+- Make sure that `npm` and `Node.js` are installed.
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+- Install the dependencies with `npm install`.
+
+- Put the trained network `model.hdf5` in `/model`.
+
+## Usage
+
+- To run the electron app: `npm run electron-build`
+
+- To run only the web app: `ng serve`
+
+- To run only the backend: `python backend.py`
+
+## Possible improvements
+
+The audio is recorded as a `.webm` then converted as a `.wav` and then resampled. This pipeline is quite complicated and it could be interesting to record a `.wav` with the good sampling rate directly.
+
+The data is transferred to the backend with a simple POST request executed at a fixed interval. It might not be the most optimized way to do so.

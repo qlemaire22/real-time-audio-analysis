@@ -37,3 +37,8 @@ testem.log
 # System Files
 .DS_Store
 Thumbs.db
+
+*.hdf5
+/model
+*.wav
+*.webm
