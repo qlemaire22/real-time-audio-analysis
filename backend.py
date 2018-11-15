@@ -7,9 +7,6 @@ from flask_restful import Resource, Api, reqparse
 from flask_cors import CORS
 import base64
 import numpy as np
-from smd.data import preprocessing
-import smd.utils as utils
-import keras.models
 import os
 
 
@@ -24,7 +21,8 @@ CORS(app)
 predict_request = reqparse.RequestParser()
 predict_request.add_argument('audio')
 
-model = keras.models.load_model("model/model.hdf5")
+model = None
+
 mean = np.load("model/mean.npy")
 std = np.load("model/std.npy")
 
@@ -33,6 +31,8 @@ memory = ""
 
 
 def test_data_processing(spec):
+    from smd.data import preprocessing
+
     mels = preprocessing.get_scaled_mel_bands(spec)
     mels = preprocessing.normalize(mels, mean, std)
     return mels.T
@@ -44,7 +44,16 @@ def display():
 
 
 class Predict(Resource):
+    def get(self):
+        global model
+        import keras.models
+        if model is None:
+            model = keras.models.load_model("model/model.hdf5")
+        return
+
     def post(self):
+        from smd.data import preprocessing
+        import smd.utils as utils
         global x_tot
         global memory
 

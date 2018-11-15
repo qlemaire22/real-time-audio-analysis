@@ -3,17 +3,27 @@
 <p>
   Click on start recording to start the real-time analysis of the audio.
 </p>
-<br>
 <div class="container">
   <div class="row">
-    <div class="col-sm">
-      <button type="button" id="start" (click)="startRecording()" class="btn btn-primary float-right">Start recording</button>
+    <div class="col-md-6 mt-4">
+      <div class="row">
+        <div class="col">
+          <button type="button" id="start" (click)="startRecording()" class="btn btn-primary float-right">Start recording</button>
+        </div>
+        <div class="col">
+          <button type="button" id="stop" (click)="stopRecording()" class="btn btn-primary">Stop recording</button>
+        </div>
+      </div>
     </div>
-    <div class="col-sm">
-      <button type="button" id="stop" (click)="stopRecording()" class="btn btn-primary">Stop recording</button>
-    </div>
-    <div class="col-sm">
-      <button type="button" id="play" (click)="playRecordedAudio()" class="btn btn-primary float-left">Play recording</button>
+    <div class="col-md-6 mt-4">
+      <div class="row">
+        <div class="col">
+          <button type="button" id="save" (click)="saveRecording()" class="btn btn-primary float-right">Save recording</button>
+        </div>
+        <div class="col">
+          <button type="button" id="play" (click)="playRecordedAudio()" class="btn btn-primary">Play recording</button>
+        </div>
+      </div>
     </div>
   </div>
 </div>

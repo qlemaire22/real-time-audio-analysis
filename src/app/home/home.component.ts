@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import * as FileSaver from 'file-saver';
 
 declare var MediaRecorder: any;
 
@@ -11,15 +12,16 @@ declare var MediaRecorder: any;
 export class HomeComponent implements OnInit {
   URL: string = "http://localhost:2222/predict";
   time_timer: number = 100;
-  time_request: number = 5000;
+  time_request: number = 1000;
 
   private mediaRecorder;
   private isSending: boolean = false;
-  public result: string = "Timer: 0.0<br>Please, start the recording.."
+  public result: string = "Timer: 0.0<br>Loading.."
   public result_post: string = "";
   public start_button;
   public stop_button;
   public play_button;
+  public save_button;
   private interval
   private time: number = 0;
   private blobList = [];
@@ -36,10 +38,24 @@ export class HomeComponent implements OnInit {
     this.start_button = document.getElementById("start");
     this.stop_button = document.getElementById("stop");
     this.play_button = document.getElementById("play");
+    this.save_button = document.getElementById("save");
 
     this.stop_button.disabled = true;
-    this.start_button.disabled = false;
+    this.start_button.disabled = true;
     this.play_button.disabled = true;
+    this.save_button.disabled = true;
+
+    this.http.get(this.URL)
+      .subscribe(
+        _ => {
+          this.updateResult("Timer: 0.0<br>Ready!")
+          this.start_button.disabled = false;
+        },
+        error => {
+          this.updateResult("Timer: 0.0<br>Impossible to set up the backend..")
+          console.log("Error", error);
+        }
+      );
 
     navigator.mediaDevices.getUserMedia({ audio: true })
       .then(stream => {
@@ -52,8 +68,9 @@ export class HomeComponent implements OnInit {
   }
 
   startTimer() {
+    var start = new Date().getTime();
     this.interval = setInterval(() => {
-      this.time = this.time + this.time_timer / 1000;
+      this.time = (new Date().getTime() - start) / 1000;
       this.updateResult("Timer: " + this.time.toFixed(1) + "<br>Output: " + this.result_post)
     }, this.time_timer)
   }
@@ -71,32 +88,32 @@ export class HomeComponent implements OnInit {
     this.play_button.disabled = true;
     this.stop_button.disabled = false;
     this.start_button.disabled = true;
+    this.save_button.disabled = true;
+
     this.playing = true;
 
     this.audio.play();
 
     var _this = this
-    var output = "";
     var i = 0;
+    this.result_post = ""
     this.time = 0;
 
     setInterval(() => {
       if (this.playing) {
-        output = this.outputList[i];
+        this.result_post = this.outputList[i];
         i = i + 1;
       }
     }, this.time_request)
 
-    this.interval = setInterval(() => {
-      this.time = this.time + this.time_timer / 1000;
-      this.updateResult("Timer: " + this.time.toFixed(1) + "<br>Output: " + output)
-    }, this.time_timer)
+    this.startTimer();
 
     this.audio.onended = function() {
       _this.pauseTimer()
       _this.play_button.disabled = false;
       _this.stop_button.disabled = true;
       _this.start_button.disabled = false;
+      _this.save_button.disabled = false;
       _this.playing = false;
     };
   }
@@ -139,6 +156,7 @@ export class HomeComponent implements OnInit {
         this.play_button.disabled = true;
         this.stop_button.disabled = false;
         this.start_button.disabled = true;
+        this.save_button.disabled = true;
 
         this.mediaRecorder.start();
         this.startTimer()
@@ -165,10 +183,9 @@ export class HomeComponent implements OnInit {
   }
 
   sendData() {
-    setTimeout(() => {
+    setInterval(() => {
       if (this.isSending) {
         this.mediaRecorder.requestData();
-        this.sendData();
       }
     }, this.time_request);
   }
@@ -185,6 +202,8 @@ export class HomeComponent implements OnInit {
       this.play_button.disabled = false;
       this.stop_button.disabled = true;
       this.start_button.disabled = false;
+      this.save_button.disabled = false;
+
       this.playing = false;
     } else {
       console.log("Stop recording..")
@@ -194,9 +213,26 @@ export class HomeComponent implements OnInit {
       this.start_button.disabled = false;
       this.stop_button.disabled = true;
       this.play_button.disabled = false;
+      this.save_button.disabled = false;
+
 
       this.mediaRecorder.stop();
       this.isSending = false;
     }
+  }
+
+  saveRecording() {
+    const audioBlob = new Blob(this.blobList);
+    FileSaver.saveAs(audioBlob, "audio.webm");
+
+    var list = []
+
+    for (var i = 0; i < this.outputList.length; i++) {
+        list.push((((i + 1) * this.time_request) / 1000).toFixed(1) + " " + (((i + 2) * this.time_request) / 1000).toFixed(1) + "  " + this.outputList[i] + "\n");
+    }
+
+    let blob = new Blob(list, { type: 'text/plain;charset=utf-8' });
+    FileSaver.saveAs(blob, "annotations.txt");
+
   }
 }
